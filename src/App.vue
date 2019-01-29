@@ -8,6 +8,12 @@
     </nav>
 
     <div class="container">
+		
+		<ul>
+			<li v-for="(erro, index) of errors" :key="index">
+				campo <b>{{ erro.field }}</b> - {{ erro.defaultMessage }}
+			</li>
+		</ul>
       <form @submit.prevent="salvar">
 
           <label>Nome</label>
@@ -34,7 +40,7 @@
 
             <td>{{ equipe.nome }}</td>
             <td>
-              <button class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
+              <button @click="editar(equipe)" class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
               <button class="waves-effect btn-small red darken-1"><i class="material-icons">delete_sweep</i></button>
             </td>
 
@@ -57,9 +63,11 @@
 		data(){
 			return{
 				equipe: {
-					nome: ''
+					nome: '',
+					id: ''
 				},
-				equipes: []
+				equipes: [],
+				errors: []
 			}
 		},
 		mounted(){
@@ -69,11 +77,36 @@
 		},
 	
 		methods:{
-			salvar(){
-				Equipe.salvar(this.equipe).then(resposta => {
-					this.equipe = {}
-					alert('Salvo com sucesso!')
+	
+			listar(){
+				Equipe.listar().then(resposta => {
+					this.equipes = resposta.data
 				})
+			},
+		
+			salvar(){
+				if(!this.equipe.id){
+					Equipe.salvar(this.equipe).then(resposta => {
+						this.equipe = {}
+						alert('Salvo com sucesso!')
+						this.listar()
+					}).catch(e => {
+						this.errors = e.response.data.errors
+					})
+				}else{
+					Equipe.atualizar(this.equipe).then(resposta => {
+						this.equipe = {}
+						alert('Atualizado com sucesso!')
+						this.listar()
+					}).catch(e => {
+						this.errors = e.response.data.errors
+					})
+				}
+				
+			},
+			
+			editar(equipe){
+				this.equipe = equipe
 			}
 		}
 	}
