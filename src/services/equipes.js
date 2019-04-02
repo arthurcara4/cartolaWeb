@@ -12,6 +12,10 @@ export default {
 	
 	atualizar:(equipe) => {
 		return http.put('equipe', equipe)
+	},
+	
+	apagar:(equipe) => {
+		return http.delete('equipe', { data: equipe })
 	}
 	
 }

@@ -1,4 +1,4 @@
-<template>
+<template id="equipes">
   <div id="app">
 
     <nav>
@@ -41,7 +41,7 @@
             <td>{{ equipe.nome }}</td>
             <td>
               <button @click="editar(equipe)" class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
-              <button class="waves-effect btn-small red darken-1"><i class="material-icons">delete_sweep</i></button>
+              <button @click="remover(equipe)" class="waves-effect btn-small red darken-1"><i class="material-icons">delete_sweep</i></button>
             </td>
 
           </tr>
@@ -64,7 +64,8 @@
 			return{
 				equipe: {
 					nome: '',
-					id: ''
+					id: '',
+					show: 'false'
 				},
 				equipes: [],
 				errors: []
@@ -107,6 +108,19 @@
 			
 			editar(equipe){
 				this.equipe = equipe
+			},
+	
+			remover(equipe){
+	
+				if(confirm('Deseja excluir a equipe?')){
+					Equipe.apagar(equipe).then(resposta => {
+						this.listar()
+						this.errors = {}
+					}).catch(e => {
+						this.errors = e.response.data.errors
+					})
+				}
+				
 			}
 		}
 	}
