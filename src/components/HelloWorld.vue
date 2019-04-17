@@ -27,16 +27,36 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+    <h4>Objetos</h4>
+    <ul>
+      <li v-for="item in objetos" :key="item.name"><router-link :to="{ name: 'SubRota', params: { name: item.upp } }">{{ item.name }}</router-link></li>
+    </ul>
+    <router-view></router-view>
+        
   </div>
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+import SubRota from './SubRota.vue'
+		
+	export default{
+	
+	  components: {
+			SubRota
+		},  
+    name: 'HelloWorld',
+    props: {
+      msg: String
+    },
+    data() {
+      return{
+        objetos: [
+          { name: 'obj1', upp: 'OBJ1' },
+          { name: 'obj2', upp: 'OBJ2' }
+        ]
+      }
+    }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
