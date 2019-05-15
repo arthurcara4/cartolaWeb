@@ -8,3 +8,5 @@ new Vue({
   router,
   render: h => h(Index)
 })
+
+

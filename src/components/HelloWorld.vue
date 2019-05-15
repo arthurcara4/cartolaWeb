@@ -30,8 +30,9 @@
     <h4>Objetos</h4>
     <ul>
       <li v-for="item in objetos" :key="item.name"><router-link :to="{ name: 'SubRota', params: { name: item.upp } }">{{ item.name }}</router-link></li>
+      <router-view></router-view>
     </ul>
-    <router-view></router-view>
+    
         
   </div>
 </template>

@@ -1,9 +1,9 @@
-<template id="equipes">
+<template id="tabela">
   <div id="app">
 
     <nav>
       <div class="nav-wrapper blue darken-1">
-        <a href="#" class="brand-logo center">Cartola Futmesa - Cadastro de Equipes</a>
+        <a href="#" class="brand-logo center">Cartola Futmesa - Tabela</a>
       </div>
     </nav>
 
@@ -16,8 +16,8 @@
 		</ul>
       <form @submit.prevent="salvar">
 
-          <label>Nome</label>
-          <input type="text" placeholder="Nome" v-model="equipe.nome">
+          <label>Data</label>
+          <input type="text" placeholder="Data" v-model="rodada.dataRodada">
 
           <button class="waves-effect waves-light btn-small">Salvar<i class="material-icons left">save</i></button>
 
@@ -28,7 +28,7 @@
         <thead>
 
           <tr>
-            <th>NOME</th>
+            <th>RODADAS</th>
             <th>OPÇÕES</th>
           </tr>
 
@@ -36,21 +36,19 @@
 
         <tbody>
 
-          <tr v-for="equipe of equipes" :key="equipe.id">
+          <tr v-for="rodada of rodadas" :key="rodada.id">
 
-            <td>{{ equipe.nome }}</td>
-            <td>
-              <button @click="editar(equipe)" class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
-              <button @click="remover(equipe)" class="waves-effect btn-small red darken-1"><i class="material-icons">delete_sweep</i></button>
-							<router-link :to="{name: 'jogadores', params: { equipe: equipe }}"  tag="button" class="waves-effect btn-small green darken-1"><i class="material-icons">person</i></router-link>
-            </td>
-
-          </tr>
+            <td style=width:100%> 
+							
+							<!--<router-link :to="{name: 'JogosRodada', params: { rodada: rodada }}"  tag="button" class="btn waves-effect waves-light">  {{ formatDataRodada(rodada.dataRodada) }} <i class="material-icons">send</i></router-link>-->
+							<jogos-rodada :rodada="[rodada]" :equipes="[equipes]"></jogos-rodada>
+						</td>
+					</tr>
+					
 
         </tbody>
       
       </table>
-			<router-link :to="{ name: 'HelloWorld' }">HelloWorld</router-link>
 
 
     </div>
@@ -62,46 +60,61 @@
 	
 <script>
 	
-	import Equipe from './services/equipes'
-	import HelloWorld from './components/HelloWorld.vue'
-	import Jogadores from './Jogadores.vue'
+	import Rodada from './services/rodadas'
+	import JogosRodada from './JogosRodada.vue'
+	import Equipes from './services/equipes'
 	
-	
+	function formatDataRodada(dtRodada){
+				var dtRodada = String(dtRodada);
+				return dtRodada.substring(8,10) + '/' + dtRodada.substring(5,7) + '/' + dtRodada.substring(0,4);
+			}
 	export default{
-	
 		
-	
 		components: {
-			HelloWorld,
-			Jogadores
+			JogosRodada
 		},
 	
 		data(){
 			return{
-				equipe: {
-					nome: '',
+				equipes: [],
+				rodada: {
 					id: '',
+					dataRodada: '',
 					show: 'false'
 				},
-				equipes: [],
+				rodadas: [],
 				errors: []
 			}
 		},
 		mounted(){
-			Equipe.listar().then(resposta => {
-				this.equipes = resposta.data;
-			})
+			Rodada.listar().then(resposta => {
+				this.rodadas = resposta.data;
+			}),
+			Equipes.listar().then(resposta => {
+					this.equipes = resposta.data
+				})
 		},
 	
 		methods:{
 	
 			listar(){
-				Equipe.listar().then(resposta => {
+				Rodada.listar().then(resposta => {
+					this.rodadas = resposta.data
+				})
+			},
+
+			listarEquipes(){
+				Equipes.listar().then(resposta => {
 					this.equipes = resposta.data
 				})
 			},
+
+			formatDataRodada(dtRodada){
+				var dtRodada = String(dtRodada);
+				return dtRodada.substring(8,10) + '/' + dtRodada.substring(5,7) + '/' + dtRodada.substring(0,4);
+			}
 		
-			salvar(){
+/*			salvar(){
 				if(!this.equipe.id){
 					Equipe.salvar(this.equipe).then(resposta => {
 						this.equipe = {}
@@ -136,7 +149,7 @@
 						this.errors = e.response.data.errors
 					})
 				}				
-			}
+			}*/
 		}
 	}
 	</script>
