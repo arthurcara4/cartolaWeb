@@ -4,11 +4,11 @@ import Router from 'vue-router'
 import HelloWorld from '../components/HelloWorld.vue'
 import SubRota from '../components/SubRota.vue'
 import Equipes from '../Equipes.vue'
+import Usuarios from '../Usuarios.vue'
 import Jogadores from '../Jogadores.vue'
 import Tabela from '../Tabela.vue'
 import JogosRodada from '../JogosRodada.vue'
 import vSelect from 'vue-select'
-import ComboEquipes from '../components/ComboEquipes.vue'
 
 export const http = axios.create({
 	baseURL: 'http://localhost:8080/cartola'
@@ -17,10 +17,8 @@ export const http = axios.create({
 Vue.use(Router)
 Vue.component('v-select', vSelect)
 
-
 const newLocal = 'SubRota';
 const jogos = 'JogosRodada';
-const comboEquipes = 'ComboEquipes';
 
 export default new Router({
   mode: 'history',
@@ -39,6 +37,11 @@ export default new Router({
       component: Equipes
     },
     {
+      path: '/usuarios',
+      name: 'Usuarios',
+      component: Usuarios
+    },
+    {
       path: '/jogadores',
       name: 'jogadores',
       component: Jogadores
@@ -48,10 +51,7 @@ export default new Router({
       name: 'tabela',
       component: Tabela,
       children: [
-        { path: ':name', name: jogos, component: JogosRodada, children: [
-          { path: ':vSelect', name: vSelect, component: vSelect },
-          { path: ':comboEquipes', name: comboEquipes, component: ComboEquipes }
-        ] },
+        { path: ':name', name: jogos, component: JogosRodada },
       ]
     }
   ]

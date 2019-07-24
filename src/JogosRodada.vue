@@ -25,8 +25,8 @@
           <button class="waves-effect waves-light btn-small">Salvar<i class="material-icons left">save</i></button>
 
       </form>
--->
-      <table v-show="mostra">
+-->	  <div v-show="mostra">
+      <table >
         <thead>
           <tr>
 						<th>DATA - {{ formatDataRodada(rodada.dataRodada) }}</th>
@@ -35,43 +35,50 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="jogo of jogos" :key="jogo.id">
+        <tr v-for="jogo of jogos" :key="jogo.id">
 						{{ indisponibiliza(jogo.equipeMandante) }}
 						{{ indisponibiliza(jogo.equipeVisitante) }}
-            <td>{{ jogo.equipeMandante.nome }} X {{ jogo.equipeVisitante.nome }} </td>
-            <td></td>
-            <td>
+            <td v-if="!jogoEmEdicao(jogo)" width="20%">{{ jogo.equipeMandante.nome }}</td>
+			<td v-if="!jogoEmEdicao(jogo)" width="5px"><input type="text" id="golsMan"></td>
+			<td v-if="!jogoEmEdicao(jogo)" >X</td>
+			<td v-if="!jogoEmEdicao(jogo)" width="5px"><input type="text" id="golsVis"></td>
+			<td v-if="!jogoEmEdicao(jogo)" width="20%"> {{ jogo.equipeVisitante.nome }} </td>
+            <td v-if="!jogoEmEdicao(jogo)"></td>
+            <td v-if="!jogoEmEdicao(jogo)">
               <button @click="editar(jogo)" class="waves-effect btn-small blue darken-1"><i class="material-icons">create</i></button>
               <button @click="remover(jogo)" class="waves-effect btn-small red darken-1"><i class="material-icons">delete_sweep</i></button>
             </td>
-					</tr>
-					<tr>
+		</tr>
+	</tbody>
+	</table>
+	<table>
+		<tbody>
+		<tr>
+			<td>
+				<form @submit.prevent="salvarJogo">
 						<td>
-							<form @submit.prevent="salvarJogo">
-									<td>
-										<label>Mandante</label>
-										<v-select :options="montaCombo()" label="nome" v-model="jogo.equipeMandante"></v-select>
-									<td>
-										X
-									</td>
-									<td>
-										<label>Visitante</label>
-										<v-select :options="montaCombo()" label="nome" v-model="jogo.equipeVisitante"></v-select>
-										<!--<combo-equipes :options="equipes" label="nome"></combo-equipes>-->
-									</td>
-									<td>
-										<button class="waves-effect waves-light btn-small">Salvar<i class="material-icons left">save</i></button>
-									</td>
-							</form>
-						</td>
-					</tr>
-					<tr>
+							<v-select id="mandante" :options="montaCombo()" :selected-value="jogo.equipeMandante" placeholder="Mandante" label="nome" v-model="jogo.equipeMandante"></v-select>
 						<td>
-							<button class="btn-small green darken-1"><i class="material-icons">add_circle_outline</i></button>
+							X
 						</td>
-					</tr>
+						<td>
+							<v-select id="visitante" :options="montaCombo()" placeholder="Visitante" label="nome" v-model="jogo.equipeVisitante"></v-select>
+							<!--<combo-equipes :options="equipes" label="nome"></combo-equipes>-->
+						</td>
+						<td>
+							<button class="waves-effect waves-light btn-small">Salvar<i class="material-icons left">save</i></button>
+						</td>
+				</form>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<button class="btn-small green darken-1"><i class="material-icons">add_circle_outline</i></button>
+			</td>
+		</tr>
         </tbody>
       </table>
+	  </div>
     </div>
   </div>
 </template>
@@ -95,6 +102,7 @@
 		data(){
 			return{
 				mostra: '',
+				exibeJogo: 'show',
 				jogo: {
           id: '',
 					equipeMandante: '',
@@ -110,6 +118,7 @@
 				exibe: '',
 				equipesIndisponiveis: [],
 				equipesDisponiveis: [],
+				jogosEmEdicao: [],
 				rodada: {
 										id: this.$attrs.rodada[0].id,
 										dataRodada: this.$attrs.rodada[0].dataRodada,
@@ -157,6 +166,14 @@
 
 		methods:{
 
+			jogoEmEdicao(jogo){
+				if(this.jogosEmEdicao.includes(jogo)){
+					return 'true'
+				}else{
+					return ''
+				}
+			},
+
 			montaCombo(){
 				
 				var ind = this.equipesIndisponiveis;
@@ -171,6 +188,12 @@
 					if(!arrIndId.includes(dispid)){
 						this.equipesDisponiveis.push(disp[a]);
 					}
+				}
+				if(this.jogo.equipeMandante != null && this.jogo.equipeMandante.id != ''){
+					this.equipesDisponiveis.push(this.jogo.equipeMandante);
+				}
+				if(this.jogo.equipeVisitante != null && this.jogo.equipeVisitante.id != ''){
+					this.equipesDisponiveis.push(this.jogo.equipeVisitante);
 				}
 				return this.equipesDisponiveis;
 			},
@@ -211,37 +234,39 @@
 					Jogo.salvar(this.jogo).then(resposta => {
 						this.jogo = {}
 						alert('Salvo com sucesso!')
+						
 						this.listarPorRodada()
 					}).catch(e => {
 						this.errors = e.response.data.errors
 					})
 				}else{
-					Equipe.atualizar(this.equipe).then(resposta => {
-						this.equipe = {}
+					Jogo.atualizar(this.jogo).then(resposta => {
+						this.jogo = {}
 						alert('Atualizado com sucesso!')
-						this.listar()
+						this.listarPorRodada()
 					}).catch(e => {
 						this.errors = e.response.data.errors
 					})
 				}
 				
 			},
-/*			
-			editar(equipe){
-				this.equipe = equipe
+			
+			editar(jogo){
+				this.jogosEmEdicao = [];
+				this.jogosEmEdicao.push(jogo);
+				this.jogo = jogo
 			},
 	
-			remover(equipe){
-	
+			remover(jogo){	
 				if(confirm('Deseja excluir a equipe?')){
-					Equipe.apagar(equipe).then(resposta => {
-						this.listar()
+					Jogo.apagar(jogo).then(resposta => {
+						this.listarPorRodada()
 						this.errors = {}
 					}).catch(e => {
 						this.errors = e.response.data.errors
 					})
 				}				
-			}*/
+			}
 		}
 	}
 	</script>
